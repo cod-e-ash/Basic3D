@@ -49,19 +49,6 @@ module.exports = {
                     {loader: 'css-loader'}
                 ]
             },
-            // {
-            //     test: /\.css$/,
-            //     exclude: /[\/\\](node_modules|bower_components|public)[\/\\]/,
-            //     use: [
-            //         MiniCssExtractPlugin.loader,
-            //         {
-            //             loader: 'css-loader',
-            //             options: {
-            //                 hmr: process.env.NODE_ENV === 'development',
-            //             }
-            //         }
-            //     ]
-            // }
         ]
     },
     resolve: { extensions: [".web.ts", ".web.js", ".ts", ".js"] },
