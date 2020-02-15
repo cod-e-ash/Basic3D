@@ -1,5 +1,8 @@
-import { Socket, CameraType } from "./scripts/basic-3d";
+import { PowerStrip, Orientation } from './scripts/PowerStrip';
+import { CreateSocket, CameraType } from "./scripts/CreateSocket";
 
-const basic3D = new Socket(24);
+const powerStrip = new PowerStrip(24, Orientation.Vertical);
+const basic3D = new CreateSocket(powerStrip);
 basic3D.createScene(CameraType.PerspectiveCamera);
+window.addEventListener('resize', basic3D.onWindowResize)
 basic3D.animate();
