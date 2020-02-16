@@ -36,7 +36,7 @@ export class CreateScene {
 	public createScene = (cameraType: CameraType = CameraType.OrthographicCamera) => {
 		const orientation = Orientation.Vertical;
 		this.scene.background = new Color('0x1111dd');
-		this.scene.add(Cabinet.createRack(orientation));
+		this.scene.add(Cabinet.create(orientation));
 		this.powerStrips.map(powerStrip => this.scene.add(PowerStrip.create(powerStrip, orientation)));
 		this.scene.add(new AmbientLight(0xddffdd, 50));
 		this.camera = this.getCamera(cameraType);

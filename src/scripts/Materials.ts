@@ -35,6 +35,12 @@ export class Materials {
     color: 0xffffe6,
     vertexColors: FaceColors
   });
+  static meshRack = new MeshBasicMaterial({
+    color: 0x80ff80,
+    transparent: true,
+    opacity: 0.8,
+    wireframe: true
+  });
 
   static cubeMaterial = [
     Materials.meshSolidWhite,
