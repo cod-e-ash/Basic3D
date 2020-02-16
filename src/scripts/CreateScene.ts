@@ -6,10 +6,22 @@ import {
 	AmbientLight,
 	Color,
 	OrthographicCamera,
-	Camera
+	Camera,
+	MeshLambertMaterial,
+	Mesh,
+	BoxBufferGeometry,
+	BufferGeometry,
+	BufferAttribute,
+	CatmullRomCurve3,
+	Line,
+	LineBasicMaterial,
+	Vector3
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { PowerStrip, Orientation } from './PowerStrip';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
+
+import { PowerStrip, Orientation, Position } from './PowerStrip';
 
 export enum CameraType {
 	OrthographicCamera = 'OrthographicCamera',
@@ -24,6 +36,14 @@ export class CreateScene {
 	controls: OrbitControls;
 	renderer: WebGLRenderer;
 	camera: Camera;
+	hiding;
+	transformControl;
+	splines = {};
+	splineHelperObjects = [];
+	splinePointsLength = 8;
+	positions = [];
+	ARC_SEGMENTS = 200;
+	point = new Vector3();
 
 	constructor(private powerStrips: PowerStrip[]) {
 		this.canvas.style.borderWidth = '5px';
@@ -36,11 +56,124 @@ export class CreateScene {
 	public createScene = (cameraType: CameraType = CameraType.OrthographicCamera) => {
 		const orientation = Orientation.Vertical;
 		this.scene.background = new Color('0x1111dd');
-		this.scene.add(Cabinet.create(orientation));
-		this.powerStrips.map(powerStrip => this.scene.add(PowerStrip.create(powerStrip, orientation)));
-		this.scene.add(new AmbientLight(0xddffdd, 50));
+		// this.scene.add(Cabinet.create(orientation));
+		// this.powerStrips.map(powerStrip => this.scene.add(PowerStrip.create(powerStrip, orientation)));
+		// this.scene.add(new AmbientLight(0xddffdd, 50));
 		this.camera = this.getCamera(cameraType);
 		this.controls = new OrbitControls(this.camera, this.canvas);
+
+
+		this.controls.dampingFactor = 0.2;
+        this.controls.addEventListener("change", this.render);
+
+        this.controls.addEventListener("start", () => {
+          this.cancelHideTransform();
+        });
+
+        this.controls.addEventListener("end", () => {
+          this.delayHideTransform();
+        });
+		this.transformControl = new TransformControls(this.camera, this.canvas);
+		this.transformControl.addEventListener('change', this.render);
+		this.transformControl.addEventListener('dragging-changed', (event) => {
+			this.controls.enabled = !event.value;
+		});
+		this.scene.add(this.transformControl);
+		// Hiding transform situation is a little in a mess :()
+		this.transformControl.addEventListener('change', () => {
+			this.cancelHideTransform();
+		});
+
+		this.transformControl.addEventListener('mouseDown', () => {
+			this.cancelHideTransform();
+		});
+
+		this.transformControl.addEventListener('mouseUp', () => {
+			this.delayHideTransform();
+		});
+
+		this.transformControl.addEventListener('objectChange', () => {
+			this.updateSplineOutline();
+		});
+
+		let dragcontrols = new DragControls(
+			this.splineHelperObjects,
+			this.camera,
+			this.renderer.domElement
+		); //
+		dragcontrols.enabled = false;
+		dragcontrols.addEventListener('hoveron', (event) => {
+			this.transformControl.attach(event.object);
+			this.cancelHideTransform();
+		});
+
+		dragcontrols.addEventListener('hoveroff', () => {
+			this.delayHideTransform();
+		});
+
+		for (let i = 0; i < this.splinePointsLength; i++) {
+			this.addSplineObject(this.positions[i]);
+		}
+
+		this.positions = [];
+
+		for (var i = 0; i < this.splinePointsLength; i++) {
+			this.positions.push(this.splineHelperObjects[i].position);
+		}
+
+		var geometry = new BufferGeometry();
+		geometry.setAttribute(
+			'position',
+			new BufferAttribute(new Float32Array(this.ARC_SEGMENTS * 3), 3)
+		);
+
+		let curve = new CatmullRomCurve3(this.positions);
+		curve['curveType'] = 'catmullrom';
+		curve['mesh'] = new Line(
+			geometry.clone(),
+			new LineBasicMaterial({
+				color: 0xff0000,
+				opacity: 0.35
+			})
+		);
+		curve['mesh'].castShadow = true;
+		this.splines['uniform'] = curve;
+
+		curve = new CatmullRomCurve3(this.positions);
+		curve['curveType'] = 'centripetal';
+		curve['mesh'] = new Line(
+			geometry.clone(),
+			new LineBasicMaterial({
+				color: 0x00ff00,
+				opacity: 0.35
+			})
+		);
+		curve['mesh'].castShadow = true;
+		this.splines['centripetal'] = curve;
+
+		curve = new CatmullRomCurve3(this.positions);
+		curve['curveType'] = 'chordal';
+		curve['mesh'] = new Line(
+			geometry.clone(),
+			new LineBasicMaterial({
+				color: 0x0000ff,
+				opacity: 0.35
+			})
+		);
+		curve['mesh'].castShadow = true;
+		this.splines['chordal'] = curve;
+
+		for (var k in this.splines) {
+			var spline = this.splines[k];
+			this.scene.add(spline.mesh);
+		}
+
+		this.load([
+			new Vector3(289.76843686945404, 452.51481137238443, 56.10018915737797),
+			new Vector3(-53.56300074753207, 171.49711742836848, -14.495472686253045),
+			new Vector3(-91.40118730204415, 176.4306956436485, -6.958271935582161),
+			new Vector3(-383.785318791128, 491.1365363371675, 47.869296953772746)
+		]);
 	};
 
 	getCamera = (cameraType: CameraType): Camera => {
@@ -62,7 +195,8 @@ export class CreateScene {
 	};
 
 	prespectiveCamera = () => {
-		const pcamera = new PerspectiveCamera(45, this.aspect, 1, 3000);
+		// const pcamera = new PerspectiveCamera(45, this.aspect, 1, 3000);
+		const pcamera = new PerspectiveCamera(70, this.aspect, 1, 10000);
 		pcamera.position.z = 1100;
 		return pcamera;
 	};
@@ -76,6 +210,9 @@ export class CreateScene {
 	private render = () => {
 		// this.rotateCube();
 		// this.renderer.render(this.scene, this.ocamera);
+		// this.splines.uniform.mesh.visible = params.uniform;
+		// this.splines.centripetal.mesh.visible = params.centripetal;
+		// this.splines.chordal.mesh.visible = params.chordal;
 		this.renderer.render(this.scene, this.camera);
 	};
 
@@ -88,4 +225,92 @@ export class CreateScene {
 		this.camera.updateMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 	};
+
+	public cancelHideTransform() {
+		if (this.hiding) clearTimeout(this.hiding);
+	}
+
+	public delayHideTransform() {
+		this.cancelHideTransform();
+		this.hideTransform();
+	}
+
+	public hideTransform() {
+		this.hiding = setTimeout(() => {
+			this.transformControl.detach(this.transformControl.object);
+		}, 2500);
+	}
+
+	public addSplineObject(position?) {
+		let material = new MeshLambertMaterial({
+			color: Math.random() * 0xffffff
+		});
+		let object = new Mesh(new BoxBufferGeometry(20, 20, 20), material);
+
+		if (position) {
+			object.position.copy(position);
+		} else {
+			object.position.x = Math.random() * 1000 - 500;
+			object.position.y = Math.random() * 600;
+			object.position.z = Math.random() * 800 - 400;
+		}
+
+		object.castShadow = true;
+		object.receiveShadow = true;
+		this.scene.add(object);
+		this.splineHelperObjects.push(object);
+		return object;
+	}
+
+	public load(new_positions) {
+		while (new_positions.length > this.positions.length) {
+			this.addPoint();
+		}
+
+		while (new_positions.length < this.positions.length) {
+			this.removePoint();
+		}
+
+		for (var i = 0; i < this.positions.length; i++) {
+			this.positions[i].copy(new_positions[i]);
+		}
+
+		this.updateSplineOutline();
+	}
+
+	public addPoint() {
+		this.splinePointsLength++;
+
+		this.positions.push(this.addSplineObject().position);
+
+		this.updateSplineOutline();
+	}
+
+	public updateSplineOutline() {
+		for (let k in this.splines) {
+			let spline = this.splines[k];
+
+			let splineMesh = spline.mesh;
+			let position = splineMesh.geometry.attributes.position;
+
+			for (let i = 0; i < this.ARC_SEGMENTS; i++) {
+				let t = i / (this.ARC_SEGMENTS - 1);
+				spline.getPoint(t, this.point);
+				position.setXYZ(i, this.point.x, this.point.y, this.point.z);
+			}
+
+			position.needsUpdate = true;
+		}
+	}
+
+	public removePoint() {
+		if (this.splinePointsLength <= 4) {
+			return;
+		}
+		this.splinePointsLength--;
+		this.positions.pop();
+		this.scene.remove(this.splineHelperObjects.pop());
+
+		this.updateSplineOutline();
+	}
 }
