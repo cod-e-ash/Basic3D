@@ -17,7 +17,8 @@ export class Materials {
   static transparentMaterial: Material = new MeshBasicMaterial({
     color: 0x8d8380,
     transparent: true,
-    opacity: 0.2
+    opacity: 0.1,
+    depthWrite: false
   });
   static meshPNGMaterialRed: Material = new MeshBasicMaterial({
     map: Materials.socketTexture,
@@ -36,10 +37,9 @@ export class Materials {
     vertexColors: FaceColors
   });
   static meshRack = new MeshBasicMaterial({
-    color: 0x80ff80,
+    color: 0x6D727F,
     transparent: true,
-    opacity: 0.8,
-    wireframe: true
+    opacity: 0.2,
   });
 
   static cubeMaterial = [

@@ -19,8 +19,8 @@ export class Geometries {
   );
 
   static rackGeometry: Geometry = new BoxGeometry(
-    Geometries.socketWidth * 7,
-    Geometries.socketWidth / 2,
-    Geometries.socketWidth * 4 - 1
+    Geometries.socketWidth * 7 + 0.1,
+    Geometries.socketWidth / 2 - 1,
+    Geometries.socketWidth * 4 + 0.1
   );
 }
