@@ -39,10 +39,10 @@ export class PowerStrip {
     let containerGeometry: BoxBufferGeometry;
     if (orientation === Orientation.Horizontal) {
       containerGeometry = new BoxBufferGeometry(
-        (Geometries.socketWidth * powerStrip.numberOfSockets) + 5,
+        Geometries.socketWidth * powerStrip.numberOfSockets + 5,
         Geometries.socketWidth,
         Geometries.socketWidth
-      )
+      );
     } else {
       containerGeometry = new BoxBufferGeometry(
         Geometries.socketWidth * powerStrip.numberOfSockets + 5,
@@ -59,22 +59,26 @@ export class PowerStrip {
     const container = new LineSegments(containerEdgeGeo, Materials.lineBasicMaterial);
 
     let position = Position.Left;
-    if(orientation === Orientation.Horizontal)
-    {
-      container.position.x -=(Geometries.socketWidth * 4) - (Geometries.socketWidth * (24-powerStrip.numberOfSockets) / 2);
+    if (orientation === Orientation.Horizontal) {
+      container.position.x -=
+        Geometries.socketWidth * 4 -
+        (Geometries.socketWidth * (24 - powerStrip.numberOfSockets)) / 2;
       container.position.y = Geometries.socketWidth * powerStrip.index * 2;
-    }
-    else
-    {
+    } else {
       if (powerStrip.index % 2 !== 0) position = Position.Right;
       container.position.x = Geometries.socketWidth * 10 * position;
-      container.position.y -= (Geometries.socketWidth * (24-powerStrip.numberOfSockets) / 2);
+      container.position.y -= (Geometries.socketWidth * (24 - powerStrip.numberOfSockets)) / 2;
       container.rotateZ(Math.PI / 2);
     }
     return container;
   };
 
-  public static addSockets = (container, powerStrip: IPowerStrip, orientation: Orientation, boxType: BoxType) => {
+  public static addSockets = (
+    container,
+    powerStrip: IPowerStrip,
+    orientation: Orientation,
+    boxType: BoxType
+  ) => {
     const box3 = new Box3();
     box3.setFromObject(container);
     const size = box3.getSize(new Vector3());

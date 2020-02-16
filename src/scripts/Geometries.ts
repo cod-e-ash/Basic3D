@@ -1,4 +1,4 @@
-import { BoxGeometry, Geometry, EdgesGeometry } from "three";
+import { BoxGeometry, Geometry, EdgesGeometry } from 'three';
 
 export class Geometries {
   static socketSize = 24;
@@ -10,7 +10,7 @@ export class Geometries {
     Geometries.socketSize
   );
 
-//   static socketContainerLineGeometry = new EdgesGeometry(Geometries.socketGeometry, 10);
+  //   static socketContainerLineGeometry = new EdgesGeometry(Geometries.socketGeometry, 10);
 
   static cabinetGeometry: Geometry = new BoxGeometry(
     Geometries.socketWidth * 7,
