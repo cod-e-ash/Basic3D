@@ -275,7 +275,7 @@ export class CreateScene
             color: Math.random() * 0xffffff
         });
 
-        let object = new Mesh(new BoxBufferGeometry(20, 20, 0), Materials.meshPlugMaterialRight);
+        let object = new Mesh(new BoxBufferGeometry(20, 20, 4), Materials.plugMaterial);
 
         if(position)
         {

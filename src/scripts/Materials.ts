@@ -75,14 +75,14 @@ export class Materials
     {
         map: Materials.plugTextureRight,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.9,
         // color: 0x80ff80
     });
     static meshPlugMaterialLeft: Material = new MeshBasicMaterial(
         {
             map: Materials.plugTextureLeft,
             transparent: true,
-            opacity: 0.5,
+            opacity: 0.9,
             // color: 0x80ff80
         });
 
