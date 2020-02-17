@@ -12,8 +12,8 @@ from 'three';
 export class Materials
 {
     static socketTexture: Texture = new TextureLoader().load('../data/Socket4.png');
-    static plugTextureRight: Texture = new TextureLoader().load('../data/plugl.png');
-    static plugTextureLeft: Texture = new TextureLoader().load('../data/PlugLeft.png');
+    static plugTextureRight: Texture = new TextureLoader().load('../data/PlugR.png');
+    static plugTextureLeft: Texture = new TextureLoader().load('../data/PlugL.png');
 
     static lineBasicMaterial: Material = new LineBasicMaterial(
     {
