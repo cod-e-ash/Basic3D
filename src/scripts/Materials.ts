@@ -14,6 +14,8 @@ export class Materials
     static socketTexture: Texture = new TextureLoader().load('../data/Socket4.png');
     static plugTextureRight: Texture = new TextureLoader().load('../data/PlugR.png');
     static plugTextureLeft: Texture = new TextureLoader().load('../data/PlugL.png');
+    static wireOutletTextureLeft: Texture = new TextureLoader().load('../data/WireOutletLeft.png');
+    static wireOutletTextureRight: Texture = new TextureLoader().load('../data/WireOutletRight.png');
 
     static lineBasicMaterial: Material = new LineBasicMaterial(
     {
@@ -94,4 +96,28 @@ export class Materials
         Materials.meshPlugMaterialLeft,
         Materials.meshPlugMaterialRight
     ];
+
+    static meshWireOutletMaterialRight: Material = new MeshBasicMaterial(
+        {
+            map: Materials.wireOutletTextureRight,
+            transparent: true,
+            opacity: 0.9,
+            // color: 0x80ff80
+        });
+        static meshWireOutletMaterialLeft: Material = new MeshBasicMaterial(
+            {
+                map: Materials.wireOutletTextureLeft,
+                transparent: true,
+                opacity: 0.9,
+                // color: 0x80ff80
+            });
+    
+        static wireOutletMaterial = [
+            Materials.transparentMaterialAbsolute,
+            Materials.transparentMaterialAbsolute,
+            Materials.transparentMaterialAbsolute,
+            Materials.transparentMaterialAbsolute,
+            Materials.meshWireOutletMaterialLeft,
+            Materials.meshWireOutletMaterialRight
+        ];
 }

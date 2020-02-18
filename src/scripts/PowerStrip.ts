@@ -23,9 +23,10 @@ export interface IPowerStrip
 {
     numberOfSockets: number;
     index: number;
+    container?: Mesh;
 }
 
-export class PowerStrip
+export class PowerStrip implements IPowerStrip
 {
     constructor(public numberOfSockets: number = 24, public index: number = 0) {}
 
@@ -83,6 +84,9 @@ export class PowerStrip
             container.position.y -= (Geometries.socketWidth * (24 - powerStrip.numberOfSockets)) / 2;
             container.rotateZ(Math.PI / 2);
         }
+
+        // Add Custom Index Property
+        container['CustomIndex'] = powerStrip.index;
         return container;
     };
 
@@ -107,6 +111,8 @@ export class PowerStrip
             {
                 box.rotateZ((Math.PI / 2) * -1);
             }
+            // Add Custom Index
+            box['CustomIndex'] = i;
             container.add(box);
             curPosition += Geometries.socketWidth;
         }

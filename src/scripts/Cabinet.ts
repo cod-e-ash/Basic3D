@@ -23,7 +23,6 @@ export class Cabinet
         const box3 = new Box3();
         box3.setFromObject(cabinet);
         const size = box3.getSize(new Vector3());
-        console.log(size);
         let curPosition = size.y / 2 * -1;
         for(let i = 0; i < Cabinet.noOfUnits; i++)
         {
