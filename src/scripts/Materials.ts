@@ -88,7 +88,17 @@ export class Materials
             // color: 0x80ff80
         });
 
-    static plugMaterial = [
+    static plugMaterialLeft = [
+        Materials.transparentMaterialAbsolute,
+        Materials.transparentMaterialAbsolute,
+        Materials.transparentMaterialAbsolute,
+        Materials.transparentMaterialAbsolute,
+        Materials.meshPlugMaterialRight,
+        Materials.meshPlugMaterialLeft
+        
+    ];
+
+    static plugMaterialRight = [
         Materials.transparentMaterialAbsolute,
         Materials.transparentMaterialAbsolute,
         Materials.transparentMaterialAbsolute,

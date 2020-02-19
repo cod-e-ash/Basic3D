@@ -21,14 +21,22 @@ export enum Position
 
 export interface IPowerStrip
 {
-    numberOfSockets: number;
-    index: number;
+    Name: string;
+    Quantity: number;
+    index?: number;
     container?: Mesh;
 }
 
 export class PowerStrip implements IPowerStrip
 {
-    constructor(public numberOfSockets: number = 24, public index: number = 0) {}
+    constructor(public Name: string, public Quantity: number = 24, public index = 0) 
+    {
+    }
+
+    static getIndex(Name: string)
+    {
+
+    }
 
     static create = (powerStrip: IPowerStrip, orientation: Orientation) =>
     {
@@ -48,7 +56,7 @@ export class PowerStrip implements IPowerStrip
         if(orientation === Orientation.Horizontal)
         {
             containerGeometry = new BoxBufferGeometry(
-                Geometries.socketWidth * powerStrip.numberOfSockets + 5,
+                Geometries.socketWidth * powerStrip.Quantity + 5,
                 Geometries.socketWidth,
                 Geometries.socketWidth
             );
@@ -56,7 +64,7 @@ export class PowerStrip implements IPowerStrip
         else
         {
             containerGeometry = new BoxBufferGeometry(
-                Geometries.socketWidth * powerStrip.numberOfSockets + 5,
+                Geometries.socketWidth * powerStrip.Quantity + 5,
                 Geometries.socketWidth,
                 Geometries.socketWidth
             );
@@ -74,14 +82,23 @@ export class PowerStrip implements IPowerStrip
         {
             container.position.x -=
                 Geometries.socketWidth * 4 -
-                (Geometries.socketWidth * (24 - powerStrip.numberOfSockets)) / 2;
+                (Geometries.socketWidth * (24 - powerStrip.Quantity)) / 2;
             container.position.y = Geometries.socketWidth * powerStrip.index * 2;
         }
         else
         {
-            if(powerStrip.index % 2 !== 0) position = Position.Right;
-            container.position.x = Geometries.socketWidth * 10 * position;
-            container.position.y -= (Geometries.socketWidth * (24 - powerStrip.numberOfSockets)) / 2;
+            let factor = 1;
+            if(powerStrip.index % 2 !== 0) 
+            {
+                position = Position.Right;
+                factor += (powerStrip.index - 1) * 0.1;
+            }
+            else
+            {
+                factor += powerStrip.index * 0.1;
+            }
+            container.position.x = Geometries.socketWidth * 8 * position * factor;
+            container.position.y -= (Geometries.socketWidth * (24 - powerStrip.Quantity)) / 2;
             container.rotateZ(Math.PI / 2);
         }
 
@@ -103,7 +120,7 @@ export class PowerStrip implements IPowerStrip
         const boxSize = orientation === Orientation.Vertical ? size.y : size.x;
         let curPosition = (boxSize / 2) * -1 + Geometries.socketWidth / 2 + 2;
 
-        for(let i = 0; i < powerStrip.numberOfSockets; i++)
+        for(let i = 0; i < powerStrip.Quantity; i++)
         {
             const box = PowerStrip.createSocket(boxType);
             box.position.x = curPosition;

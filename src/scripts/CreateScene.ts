@@ -46,7 +46,7 @@ export class Connections
 
 export class CreateScene
 {
-    frustumSize = window.innerWidth * 0.6;
+    frustumSize = window.innerWidth * 0.4;
     aspect = window.innerWidth / 2 / (window.innerHeight * 0.8);
     canvas = < HTMLCanvasElement > document.getElementById('canvas');
     scene = new Scene();
@@ -183,18 +183,27 @@ export class CreateScene
         cabinet.children.map((rack, index) =>
         {
             // Create a wire outlet and set its position
-            const wireOutlet = this.createWireOutlet(this.rackSize);
+            const wireOutlet1 = this.createWireOutlet(this.rackSize);
+            const wireOutlet2 = this.createWireOutlet(this.rackSize);
 
             //  Create plug and set its position
-            const plug = this.createPlug(this.rackSize);
-            rack.add(wireOutlet);
-            rack.add(plug);
+            const plug1 = this.createPlug(this.rackSize, 1);
+            const plug2 = this.createPlug(this.rackSize, 2);
+            rack.add(wireOutlet1);
+            rack.add(wireOutlet2);
+            rack.add(plug1);
+            rack.add(plug2);
             rack.updateMatrixWorld();
-            plug['CustomIndex'] = index;
-            this.plugs.push(plug);
-            const wire = this.updateWire(index, wireOutlet, plug);
-            this.wires.push(wire);
-            this.scene.add(wire['mesh']);
+            plug1['CustomIndex'] = index*10+1;
+            plug2['CustomIndex'] = index*10+2;
+            this.plugs.push(plug1);
+            this.plugs.push(plug2);
+            const wire1 = this.updateWire(index, wireOutlet1, plug1);
+            const wire2 = this.updateWire(index, wireOutlet2, plug1);
+            this.wires.push(wire1);
+            this.wires.push(wire2);
+            this.scene.add(wire1['mesh']);
+            this.scene.add(wire2['mesh']);
         });
 
         // for(var i = 0; i < this.splinePointsLength; i++)
@@ -335,19 +344,26 @@ export class CreateScene
 
     public createWireOutlet(position: Vector3)
     {
-        const wireOutlet = new Mesh(new BoxBufferGeometry(5, 5, 8), Materials.wireOutletMaterial);
+        const wireOutlet = new Mesh(new BoxBufferGeometry(5, 5, 1), Materials.wireOutletMaterial);
 
-        // wireOutlet.position.copy(position);
         wireOutlet.position.x -= position.x / 1.95;
         return wireOutlet;
     }
 
-    public createPlug(position: Vector3)
+    public createPlug(rackSize: Vector3, index)
     {
-        const plug = new Mesh(new BoxBufferGeometry(15, 15, 10), Materials.plugMaterial);
-
-        // plug.position.copy(position);
-        plug.position.x -= position.x / 1.6;
+        let position = Position.Left;
+        let plug: Mesh;
+        if(index % 2 === 1) 
+        {
+            plug = new Mesh(new BoxBufferGeometry(5, 5, 1), Materials.plugMaterialRight);
+            position = Position.Right;
+        }
+        else
+        {
+            plug = new Mesh(new BoxBufferGeometry(5, 5, 1), Materials.plugMaterialLeft);
+        }
+        plug.position.x -= rackSize.x / 1.6 * position;
         return plug;
     }
 
@@ -366,7 +382,7 @@ export class CreateScene
         {
             const plugPosition = new Vector3().setFromMatrixPosition(plug.matrixWorld);
             wire.points.pop();
-            plugPosition.x += 7;
+            // plugPosition.x += 11;
             wire.points.push(plugPosition);
         }
         let splineMesh = wire.mesh;
@@ -422,7 +438,7 @@ export class CreateScene
     {
         this.onHoverPlugEnd();
         this.curPlug = plug;
-        this.curPlug.scale.set(1.5,1.5,1.5);
+        this.curPlug.scale.set(3,3,3);
     }
 
     onHoverPlugEnd = () =>
