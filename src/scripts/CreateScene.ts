@@ -16,8 +16,7 @@ import
     BufferGeometry,
     BufferAttribute,
     LineBasicMaterial,
-    Vector4,
-    Matrix4,
+    AmbientLight,
 }
 
 from 'three';
@@ -26,7 +25,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
 import { PowerStrip, Orientation, Position } from './PowerStrip';
-import { Materials } from './Materials';
+import { Materials, MaterialColour } from './Materials';
 import { Geometries } from './Geometries';
 
 export enum CameraType
@@ -99,7 +98,7 @@ export class CreateScene
             powerStrip['container'] = PowerStrip.create(powerStrip, orientation);
             this.scene.add(powerStrip['container']);
         });
-        this.updateConnections(1, 1, 1);
+        // this.updateConnections(1, 1, 1);
         // this.scene.add(new AmbientLight(0xddffdd, 50));
         this.camera = this.getCamera(cameraType);
         this.controls = new OrbitControls(this.camera, this.canvas);
@@ -183,71 +182,38 @@ export class CreateScene
         cabinet.children.map((rack, index) =>
         {
             // Create a wire outlet and set its position
-            const wireOutlet1 = this.createWireOutlet(this.rackSize);
-            const wireOutlet2 = this.createWireOutlet(this.rackSize);
+            const wireOutlet0 = this.createWireOutlet(this.rackSize, 0);
 
             //  Create plug and set its position
-            const plug1 = this.createPlug(this.rackSize, 1);
-            const plug2 = this.createPlug(this.rackSize, 2);
-            rack.add(wireOutlet1);
-            rack.add(wireOutlet2);
-            rack.add(plug1);
-            rack.add(plug2);
+            const plug0 = this.createPlug(this.rackSize, 0);
+            rack.add(wireOutlet0);
+            rack.add(plug0);
             rack.updateMatrixWorld();
-            plug1['CustomIndex'] = index*10+1;
-            plug2['CustomIndex'] = index*10+2;
+            this.plugs.push(plug0);
+            plug0['CustomIndex'] = this.plugs.length-1;
+            const wire0 = this.updateWire(wireOutlet0, plug0);
+            this.wires.push(wire0);
+            this.scene.add(wire0['mesh']);
+
+            const wireOutlet1 = this.createWireOutlet(this.rackSize, 1);
+            const plug1 = this.createPlug(this.rackSize, 1);
+            rack.add(wireOutlet1);
+            rack.add(plug1);
             this.plugs.push(plug1);
-            this.plugs.push(plug2);
-            const wire1 = this.updateWire(index, wireOutlet1, plug1);
-            const wire2 = this.updateWire(index, wireOutlet2, plug1);
+            plug1['CustomIndex'] = this.plugs.length-1;
+            const wire1 = this.updateWire(wireOutlet1, plug1);
             this.wires.push(wire1);
-            this.wires.push(wire2);
             this.scene.add(wire1['mesh']);
-            this.scene.add(wire2['mesh']);
+
         });
 
-        // for(var i = 0; i < this.splinePointsLength; i++)
-        // {
-        //     this.positions.push(this.splineHelperObjects[i].position);
-        // }
-
-        // var geometry = new BufferGeometry();
-        // geometry.setAttribute('position', new BufferAttribute(new Float32Array(this.ARC_SEGMENTS * 3), 3));
-
-        // let curve = new CatmullRomCurve3(this.positions);
-        // curve = new CatmullRomCurve3(this.positions);
-        // curve['curveType'] = 'chordal';
-        // curve['mesh'] = new Line(
-        //     geometry.clone(),
-        //     new LineBasicMaterial(
-        //     {
-        //         color: Math.random() * 0xffffff,
-        //         // transparent: true,
-        //         opacity: 0.65
-        //     })
-        // );
-        // // curve['mesh'].castShadow = true;
-        // this.splines['chordal'] = curve;
-
-
-        // for(var k in this.splines)
-        // {
-        //     var spline = this.splines[k];
-        //     this.scene.add(spline.mesh);
-        // }
-
-        // this.load([
-        //     new Vector3(289.76843686945404, 452.51481137238443, 56.10018915737797),
-        //     // new Vector3(-53.56300074753207, 171.49711742836848, -14.495472686253045),
-        //     // new Vector3(-91.40118730204415, 176.4306956436485, -6.958271935582161),
-        //     new Vector3(-383.785318791128, 491.1365363371675, 47.869296953772746)
-        // ]);
     }
 
-    public updateWire = (rackIndex: number, wireOutlet: Mesh, plug: Mesh) =>
+    public updateWire = (wireOutlet: Mesh, plug: Mesh) =>
     {
         const outletPosition = new Vector3();
         const plugPosition = new Vector3();
+        wireOutlet.parent.updateWorldMatrix(true, true);
         outletPosition.setFromMatrixPosition(wireOutlet.matrixWorld);
         plugPosition.setFromMatrixPosition(plug.matrixWorld);
         const curve: CatmullRomCurve3 = new CatmullRomCurve3([outletPosition, plugPosition]);
@@ -288,7 +254,6 @@ export class CreateScene
 
     prespectiveCamera = () =>
     {
-        // const pcamera = new PerspectiveCamera(45, this.aspect, 1, 3000);
         const pcamera = new PerspectiveCamera(70, this.aspect, 1, 10000);
         pcamera.position.z = 1100;
         return pcamera;
@@ -303,65 +268,38 @@ export class CreateScene
 
     private render = () =>
     {
-        // this.rotateCube();
-        // this.renderer.render(this.scene, this.ocamera);
-        // this.splines.uniform.mesh.visible = params.uniform;
-        // this.splines.centripetal.mesh.visible = params.centripetal;
-        // this.splines.chordal.mesh.visible = params.chordal;
         this.renderer.render(this.scene, this.camera);
-    };
-
-    private rotateCube = () =>
-    {
-        // this.mesh.rotation.x +=0.01;
-        // this.mesh.rotation.y +=0.01;
     };
 
     public onWindowResize: EventListener = () =>
     {
-        this.camera.updateMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        // this.aspect = window.innerWidth / 2 / (window.innerHeight * 0.8);
+        // this.renderer.setPixelRatio(this.aspect);
+        // // this.camera.updateWorldMatrix(true, true)
+        // this.renderer.setSize(window.innerWidth / 2, window.innerHeight * 0.8);
     };
 
-    // public cancelHideTransform()
-    // {
-    //     if(this.hiding) clearTimeout(this.hiding);
-    // }
-
-    // public delayHideTransform()
-    // {
-    //     this.cancelHideTransform();
-    //     this.hideTransform();
-    // }
-
-    // public hideTransform()
-    // {
-    //     this.hiding = setTimeout(() =>
-    //     {
-    //         this.transformControl.detach();
-    //     }, 2500);
-    // }
-
-    public createWireOutlet(position: Vector3)
+    public createWireOutlet(rackSize: Vector3, index: number)
     {
-        const wireOutlet = new Mesh(new BoxBufferGeometry(5, 5, 1), Materials.wireOutletMaterial);
-
-        wireOutlet.position.x -= position.x / 1.95;
+        let position = Position.Left;
+        const wireOutlet: Mesh = new Mesh(new BoxBufferGeometry(5, 5, 1), Materials.wireOutletMaterial);
+        if(index % 2 === 1) 
+        {
+            position = Position.Right;
+            wireOutlet.rotateX(Math.PI)
+        }
+        wireOutlet.position.x -= (rackSize.x / 1.95) * position;
         return wireOutlet;
     }
 
-    public createPlug(rackSize: Vector3, index)
+    public createPlug(rackSize: Vector3, index: number)
     {
         let position = Position.Left;
-        let plug: Mesh;
+        const plug: Mesh = new Mesh(new BoxBufferGeometry(5, 5, 1), Materials.plugMaterial);
         if(index % 2 === 1) 
         {
-            plug = new Mesh(new BoxBufferGeometry(5, 5, 1), Materials.plugMaterialRight);
             position = Position.Right;
-        }
-        else
-        {
-            plug = new Mesh(new BoxBufferGeometry(5, 5, 1), Materials.plugMaterialLeft);
+            plug.rotateZ(Math.PI)
         }
         plug.position.x -= rackSize.x / 1.6 * position;
         return plug;
@@ -397,10 +335,10 @@ export class CreateScene
         position.needsUpdate = true;
     }
 
-    public updateConnections = (rackIndex: number, powerStripIndex: number, powerStripSocketIndex: number) =>
-    {
-        this.connections.rack.push({ powerStrip: powerStripIndex, powerStripSocket: powerStripSocketIndex });
-    }
+    // public updateConnections = (rackIndex: number, powerStripIndex: number, powerStripSocketIndex: number) =>
+    // {
+    //     this.connections.rack.push({ powerStrip: powerStripIndex, powerStripSocket: powerStripSocketIndex });
+    // }
 
     checkSnapping = (socket: Mesh) =>
     {
@@ -423,12 +361,18 @@ export class CreateScene
         if(this.curPlug && this.curSocket)
         {
             const socketPosition = new Vector3().setFromMatrixPosition(this.curSocket.matrixWorld);
+            this.curSocket.material = Materials.meshSocketMaterialBlue;
             this.curPlug.position.x = socketPosition.x + 17;
         }
         else
         {
+            let position = Position.Left;
             this.curPlug.position.set(0, 0, 0);
-            this.curPlug.position.x -= this.rackSize.x / 1.6;
+            if(this.curPlug['CustomIndex'] % 2 === 1) 
+            {
+                position = Position.Right;
+            }
+            this.curPlug.position.x -= this.rackSize.x / 1.6 * position;
         }
         this.curPlug.updateMatrixWorld();
         this.updateWireOutline(this.curPlug['CustomIndex'], this.curPlug);

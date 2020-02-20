@@ -5,13 +5,22 @@ import
     MeshBasicMaterial,
     Texture,
     TextureLoader,
-    FaceColors
+    FaceColors,
+    MeshPhongMaterial,
+    FontLoader
 }
 from 'three';
 
+export enum MaterialColour
+{
+    Red = 0xff6666,
+        Green = 0x80ff80,
+        Blue = 0x00AAFF
+}
+
 export class Materials
 {
-    static socketTexture: Texture = new TextureLoader().load('../data/Socket4.png');
+    static socketTexture: Texture = new TextureLoader().load('../data/SquareCutout.png');
     static plugTextureRight: Texture = new TextureLoader().load('../data/PlugR.png');
     static plugTextureLeft: Texture = new TextureLoader().load('../data/PlugL.png');
     static wireOutletTextureLeft: Texture = new TextureLoader().load('../data/WireOutletLeft.png');
@@ -31,27 +40,43 @@ export class Materials
     });
 
     static transparentMaterialAbsolute: Material = new MeshBasicMaterial(
-        {
-            color: 0x8d8380,
-            transparent: true,
-            opacity: 0.01,
-            depthWrite: false
-        });
+    {
+        color: 0x8d8380,
+        transparent: true,
+        opacity: 0.01,
+        depthWrite: false
+    });
 
-    static meshPNGMaterialRed: Material = new MeshBasicMaterial(
+    static meshSocketMaterialRed: Material = new MeshBasicMaterial(
     {
         map: Materials.socketTexture,
         transparent: true,
         opacity: 0.9,
-        color: 0xff6666
+        color: MaterialColour.Red
     });
-    static meshPNGMaterialGreen: Material = new MeshBasicMaterial(
+    static meshSocketMaterialBlue: Material = new MeshBasicMaterial(
+        {
+            map: Materials.socketTexture,
+            transparent: true,
+            opacity: 0.9,
+            color: MaterialColour.Blue
+        });
+    static meshSocketMaterialGreen: Material = new MeshBasicMaterial(
     {
         map: Materials.socketTexture,
         transparent: true,
         opacity: 0.9,
-        color: 0x80ff80
+        color: MaterialColour.Blue
     });
+
+    static meshSocketMaterialWhite: Material = new MeshBasicMaterial(
+    {
+        map: Materials.socketTexture,
+        transparent: true,
+        opacity: 0.9,
+        // color: MaterialColour.Green
+    });
+
     static meshSolidWhite = new MeshBasicMaterial(
     {
         color: 0xffffe6,
@@ -64,14 +89,14 @@ export class Materials
         opacity: 0.2,
     });
 
-    static cubeMaterial = [
-        Materials.meshSolidWhite,
-        Materials.meshSolidWhite,
-        Materials.meshSolidWhite,
-        Materials.meshSolidWhite,
-        Materials.meshPNGMaterialGreen,
-        Materials.meshPNGMaterialRed
-    ];
+    // static cubeMaterialRed = [
+    //     Materials.meshPNGMaterialRed,
+    //     Materials.meshPNGMaterialRed,
+    //     Materials.meshPNGMaterialRed,
+    //     Materials.meshPNGMaterialRed,
+    //     Materials.meshPNGMaterialRed,
+    //     Materials.meshPNGMaterialRed
+    // ];
 
     static meshPlugMaterialRight: Material = new MeshBasicMaterial(
     {
@@ -81,53 +106,62 @@ export class Materials
         // color: 0x80ff80
     });
     static meshPlugMaterialLeft: Material = new MeshBasicMaterial(
-        {
-            map: Materials.plugTextureLeft,
-            transparent: true,
-            opacity: 0.9,
-            // color: 0x80ff80
-        });
+    {
+        map: Materials.plugTextureLeft,
+        transparent: true,
+        opacity: 0.9,
+        // color: 0x80ff80
+    });
 
-    static plugMaterialLeft = [
+    static plugMaterial = [
         Materials.transparentMaterialAbsolute,
         Materials.transparentMaterialAbsolute,
         Materials.transparentMaterialAbsolute,
         Materials.transparentMaterialAbsolute,
         Materials.meshPlugMaterialRight,
         Materials.meshPlugMaterialLeft
-        
+
     ];
 
-    static plugMaterialRight = [
-        Materials.transparentMaterialAbsolute,
-        Materials.transparentMaterialAbsolute,
-        Materials.transparentMaterialAbsolute,
-        Materials.transparentMaterialAbsolute,
-        Materials.meshPlugMaterialLeft,
-        Materials.meshPlugMaterialRight
-    ];
+    // static plugMaterialRight = [
+    //     Materials.transparentMaterialAbsolute,
+    //     Materials.transparentMaterialAbsolute,
+    //     Materials.transparentMaterialAbsolute,
+    //     Materials.transparentMaterialAbsolute,
+    //     Materials.meshPlugMaterialLeft,
+    //     Materials.meshPlugMaterialRight
+    // ];
 
     static meshWireOutletMaterialRight: Material = new MeshBasicMaterial(
-        {
-            map: Materials.wireOutletTextureRight,
-            transparent: true,
-            opacity: 0.9,
-            // color: 0x80ff80
-        });
-        static meshWireOutletMaterialLeft: Material = new MeshBasicMaterial(
-            {
-                map: Materials.wireOutletTextureLeft,
-                transparent: true,
-                opacity: 0.9,
-                // color: 0x80ff80
-            });
-    
-        static wireOutletMaterial = [
-            Materials.transparentMaterialAbsolute,
-            Materials.transparentMaterialAbsolute,
-            Materials.transparentMaterialAbsolute,
-            Materials.transparentMaterialAbsolute,
-            Materials.meshWireOutletMaterialLeft,
-            Materials.meshWireOutletMaterialRight
-        ];
+    {
+        map: Materials.wireOutletTextureRight,
+        transparent: true,
+        opacity: 0.9,
+        // color: 0x80ff80
+    });
+    static meshWireOutletMaterialLeft: Material = new MeshBasicMaterial(
+    {
+        map: Materials.wireOutletTextureLeft,
+        transparent: true,
+        opacity: 0.9,
+        // color: 0x80ff80
+    });
+
+    static wireOutletMaterial = [
+        Materials.transparentMaterialAbsolute,
+        Materials.transparentMaterialAbsolute,
+        Materials.transparentMaterialAbsolute,
+        Materials.transparentMaterialAbsolute,
+        Materials.meshWireOutletMaterialLeft,
+        Materials.meshWireOutletMaterialRight
+    ];
+
+    // static wireOutletMaterialLeft = [
+    //     Materials.transparentMaterialAbsolute,
+    //     Materials.transparentMaterialAbsolute,
+    //     Materials.transparentMaterialAbsolute,
+    //     Materials.transparentMaterialAbsolute,
+    //     Materials.meshWireOutletMaterialLeft,
+    //     Materials.meshWireOutletMaterialRight
+    // ];
 }
