@@ -4,7 +4,7 @@
   "description": "Basic 3D Playground",
   "main": "index.js",
   "dependencies": {
-    "three": "^0.113.2"
+    "three": "^0.137.0"
   },
   "devDependencies": {
     "awesome-typescript-loader": "latest",
